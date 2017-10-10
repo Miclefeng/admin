@@ -30,7 +30,7 @@ $pagesize = 10;
 $res = $db->count("SELECT count(`id`) AS `total` FROM `user` " . $where);
 $pagetotal = ceil($res['total'] / $pagesize);
 
-if($pagetotal > 0){
+if ($pagetotal > 0) {
     if ($page > $pagetotal) $page = $pagetotal;
 }
 
@@ -72,6 +72,11 @@ $data = $db->query($sql)->row_all();
     <link rel="stylesheet" href="assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="assets/css/admin.css">
     <link rel="stylesheet" href="assets/css/app.css">
+    <style>
+        .edit-goal {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body data-type="generalComponents">
@@ -182,21 +187,22 @@ $data = $db->query($sql)->row_all();
                                     </thead>
                                     <tbody>
                                     <?php foreach ($data as $k => $v): ?>
-                                        <tr>
+                                        <tr class="edit-goal-tr" uid="<?=$v['id']?>">
                                             <td><input type="checkbox"></td>
                                             <td><?= $v['id'] ?></td>
                                             <td><?= $v['username'] ?></td>
                                             <td><?= $v['phone'] ?></td>
-                                            <td class="am-hide-sm-only"><?= $v['goal'] ?></td>
+                                            <td class="edit-goal"><?= $v['goal'] ?></td>
                                             <td class="am-hide-sm-only"><?= $v['address'] ?></td>
-                                            <td>
-                                                <div class="am-btn-toolbar">
+                                            <td class="operation">
+                                                <div class="am-btn-toolbar edit-delete-btn">
                                                     <div class="am-btn-group am-btn-group-xs">
                                                         <a href="user/operation.php?id=<?= $v['id'] ?>"
                                                            class="am-btn am-btn-default am-btn-xs am-text-secondary"><span
                                                                     class="am-icon-pencil-square-o"></span> 编辑
                                                         </a>
-                                                        <a uid="<?=$v['id']?>" class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only delete-user">
+                                                        <a uid="<?= $v['id'] ?>"
+                                                           class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only delete-user">
                                                             <span class="am-icon-trash-o"></span> 删除
                                                         </a>
                                                     </div>
@@ -207,25 +213,29 @@ $data = $db->query($sql)->row_all();
                                     </tbody>
                                 </table>
                                 <?php if (!empty($page_link)): ?>
-                                <div class="am-cf">
-                                    <div class="am-fr">
-                                        <ul class="am-pagination tpl-pagination">
-                                            <?php if (isset($page_link['first_page'])): ?>
-                                                <li><a href="<?= $page_link['base_url'] ?>?<?= $page_link['first_page']?>">«</a></li>
-                                            <?php endif;?>
-                                            <?php foreach ($page_link['loop_page'] as $k => $v): ?>
-                                                <li<?php if ($k == $page_link['cur_page']): ?> class="am-active"<?php endif; ?>><?php if ($k != $page_link['cur_page']): ?>
-                                                        <a
-                                                        href="<?= $page_link['base_url'] ?>?<?= $v ?>"><?= $k ?></a><?php else: ?>
-                                                        <span style="border-radius: 3px;
+                                    <div class="am-cf">
+                                        <div class="am-fr">
+                                            <ul class="am-pagination tpl-pagination">
+                                                <?php if (isset($page_link['first_page'])): ?>
+                                                    <li>
+                                                        <a href="<?= $page_link['base_url'] ?>?<?= $page_link['first_page'] ?>">«</a>
+                                                    </li>
+                                                <?php endif; ?>
+                                                <?php foreach ($page_link['loop_page'] as $k => $v): ?>
+                                                    <li<?php if ($k == $page_link['cur_page']): ?> class="am-active"<?php endif; ?>><?php if ($k != $page_link['cur_page']): ?>
+                                                            <a
+                                                            href="<?= $page_link['base_url'] ?>?<?= $v ?>"><?= $k ?></a><?php else: ?>
+                                                            <span style="border-radius: 3px;
     padding: 6px 12px;"><?= $k ?></span><?php endif; ?></li>
-                                            <?php endforeach; ?>
-                                            <?php if (isset($page_link['last_page'])): ?>
-                                                <li><a href="<?= $page_link['base_url'] ?>?<?= $page_link['last_page']?>">»</a></li>
-                                            <?php endif; ?>
-                                        </ul>
+                                                <?php endforeach; ?>
+                                                <?php if (isset($page_link['last_page'])): ?>
+                                                    <li>
+                                                        <a href="<?= $page_link['base_url'] ?>?<?= $page_link['last_page'] ?>">»</a>
+                                                    </li>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
                                 <?php endif; ?>
                                 <hr>
                             </form>
@@ -242,28 +252,103 @@ $data = $db->query($sql)->row_all();
     <script src="assets/js/app.js"></script>
 </body>
 <script type="application/javascript">
-    $(".delete-user").click(function(){
-        if(confirm('你确定要删除吗？')){
+    $(".delete-user").click(function () {
+        if (confirm('你确定要删除吗？')) {
             var id = $(this).attr('uid');
             $.ajax({
                 type: "POST",
                 url: "./user/delete.php",
                 dataType: "json",
-                data : {
-                    id : id
+                data: {
+                    id: id
                 },
                 success: function (data) {
-                    if(data.status == 2000){
+                    if (data.status == 2000) {
                         alert(data.msg);
                         window.location = "./index.php";
-                    }else{
+                    } else {
                         alert(data.msg);
                     }
                 }
             });
         }
+    });
 
-        console.log(id);
+    var click = 1;
+    $(".edit-goal-tr").on("click", ".edit-goal", function () {
+        if(click == 1){
+            var val = $(this).text();
+            var idx = $(this).parent().index();
+            var html = '<input type="text" style="width:30%;float:left;" name="goal" value="' + val + '">';
+            var button = '<span class="am-btn am-btn-default am-btn-xs am-text-secondary goal-save" style="float:left;width: 60px;margin: 0px 1px;">保存</span><span class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only goal-cancel" style="float:left;width: 60px;margin: 0px 1px;">取消</span>';
+            $(this).empty().append(html);
+            $(".edit-delete-btn").each(function (i, e) {
+                if (i == idx) {
+                    $(this).css('display', 'none');
+                }
+            });
+            $(".operation").each(function (i, e) {
+                if (i == idx) {
+                    $(this).append(button);
+                }
+            });
+            click = 2;
+        }
+    });
+
+    $(".edit-goal-tr").on("click", ".goal-cancel", function () {
+        var idx = $(this).parent().parent().index();
+        $(this).prev().remove();
+        $(this).remove();
+        $(".edit-delete-btn").each(function (i, e) {
+            if (i == idx) {
+                $(this).css('display', 'block');
+            }
+        });
+        $(".edit-goal").each(function (i, e) {
+            if (i == idx) {
+                var val = $(this).children("input").val();
+                $(this).html(val);
+            }
+        });
+        click = 1;
+    });
+
+    $(".edit-goal-tr").on("click", ".goal-save", function () {
+        var idx = $(this).parent().parent().index();
+        var id = $(this).parent().parent().attr('uid');
+        $(this).next().remove();
+        $(this).remove();
+        $(".edit-delete-btn").each(function (i, e) {
+            if (i == idx) {
+                $(this).css('display', 'block');
+            }
+        });
+        $(".edit-goal").each(function (i, e) {
+            if (i == idx) {
+                var goal_td = $(this);
+                var val = goal_td.children("input").val();
+                $.ajax({
+                    type: "POST",
+                    url: "./user/edit_goal.php",
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        goal : val
+                    },
+                    success: function (data) {
+                        if (data.status == 2000) {
+                            alert(data.msg);
+                            goal_td.html(val);
+                        } else {
+                            alert(data.msg);
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+        });
+        click = 1;
     });
 </script>
 </html>
