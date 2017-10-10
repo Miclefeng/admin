@@ -25,7 +25,7 @@ if (!empty($search)) {
     $query_str['s'] = $search;
 }
 
-$pagesize = 10;
+$pagesize = 20;
 
 $res = $db->count("SELECT count(`id`) AS `total` FROM `user` " . $where);
 $pagetotal = ceil($res['total'] / $pagesize);
