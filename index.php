@@ -275,9 +275,11 @@ $data = $db->query($sql)->row_all();
     });
 
     var click = 1;
+    var original_goal = 0;
     $(".edit-goal-tr").on("click", ".edit-goal", function () {
         if(click == 1){
             var val = $(this).text();
+            original_goal = val;
             var idx = $(this).parent().index();
             var html = '<input type="text" style="width:30%;float:left;" name="goal" value="' + val + '">';
             var button = '<span class="am-btn am-btn-default am-btn-xs am-text-secondary goal-save" style="float:left;width: 60px;margin: 0px 1px;">保存</span><span class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only goal-cancel" style="float:left;width: 60px;margin: 0px 1px;">取消</span>';
@@ -307,8 +309,7 @@ $data = $db->query($sql)->row_all();
         });
         $(".edit-goal").each(function (i, e) {
             if (i == idx) {
-                var val = $(this).children("input").val();
-                $(this).html(val);
+                $(this).html(original_goal);
             }
         });
         click = 1;
