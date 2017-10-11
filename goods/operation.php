@@ -6,6 +6,70 @@
  * Time: 9:56
  */
 error_reporting(E_ERROR);
+require_once("../Mpdo.php");
+$conf = include_once("../config.php");
+$mysql = new Mpdo();
+$db = $mysql->connect($conf['database']);
+if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(empty($_POST['phone']) || !is_numeric(trim($_POST['phone']))){
+        echo '<script>alert("请输入正确的手机号！");window.history.go(-1);</script>>';
+        exit();
+    }
+
+    $data['name'] = (isset($_POST['name']) && !empty($_POST['name'])) ? trim($_POST['name']) : '' ;
+    $data['phone'] = (isset($_POST['phone']) && !empty($_POST['phone'])) ? trim($_POST['phone']) : '' ;
+    $data['address'] = (isset($_POST['address']) && !empty($_POST['address'])) ? trim($_POST['address']) : '' ;
+    $data['username'] = (isset($_POST['username']) && !empty($_POST['username'])) ? trim($_POST['username']) : '' ;
+
+    if(isset($_POST['id']) && !empty(intval($_POST['id']))){
+        $id = intval($_POST['id']);
+        $sql = "UPDATE `firm` SET `name`=?,`phone`=?,`address`=?,`username`=? WHERE `id`={$id}";
+        $res = $db->update($sql,array_values($data));
+        if($res){
+            echo '<script>alert("修改货品信息成功！");window.location = "goods.php";</script>>';
+            exit();
+        }else{
+            echo '<script>alert("修改货品信息失败！");window.history.go(-1);</script>>';
+            exit();
+        }
+    }else{
+        $sql = "INSERT INTO `firm` (`name`,`phone`,`address`,`username`) VALUES (?,?,?,?)";
+        $res = $db->insert($sql,array_values($data));
+        if($res){
+            echo '<script>alert("添加货品信息成功！");window.location = "goods.php";</script>>';
+            exit();
+        }else{
+            echo '<script>alert("添加货品信息失败！");window.history.go(-1);</script>>';
+            exit();
+        }
+    }
+
+}
+
+if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
+    $id = intval($_GET['id']);
+    $sql = "SELECT * FROM `goods` WHERE `id`={$id}";
+    $goodsInfo = $db->query($sql)->row_one();
+}
+
+function get_category($db)
+{
+    $sql = "SELECT * FROM `category` WHERE `pid`=0";
+    $data = $db->query($sql)->row_all();
+    $category = [];
+    $i = 0;
+    foreach ($data as $k => $v){
+        $category[$i]['id'] = $v['id'];
+        $category[$i]['name'] = $v['name'];
+        $sql = "SELECT * FROM `category` WHERE `pid`={$v['id']}";
+        $children = $db->query($sql)->row_all();
+        foreach ($children as $m => $n){
+            $category[$i]['children'][] = $n;
+        }
+        $i++;
+    }
+    return $category;
+}
 ?>
 <!doctype html>
 <html>
@@ -37,7 +101,7 @@ error_reporting(E_ERROR);
                     </a>
                 </li>
                 <li class="tpl-left-nav-item">
-                    <a href="goods.php" class="nav-link tpl-left-nav-link-list active">
+                    <a href="../goods/goods.php" class="nav-link tpl-left-nav-link-list active">
                         <i class="am-icon-bar-chart"></i>
                         <span>货品信息</span>
                     </a>
@@ -49,7 +113,6 @@ error_reporting(E_ERROR);
                         <i class="am-icon-table"></i>
                         <span>货品分类</span>
                         <!-- 列表打开状态的i标签添加 tpl-left-nav-more-ico-rotate 图表即90°旋转  -->
-                        <!--                  <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i> -->
                     </a>
                 </li>
 
@@ -57,7 +120,6 @@ error_reporting(E_ERROR);
                     <a href="../firm/firm.php" class="nav-link tpl-left-nav-link-list">
                         <i class="am-icon-wpforms"></i>
                         <span>进货商信息</span>
-                        <!-- <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right"></i> -->
                     </a>
                 </li>
             </ul>
@@ -67,9 +129,9 @@ error_reporting(E_ERROR);
         <div class="tpl-content-page-title">
             <?php
                 if(isset($_GET['id']) && !empty(intval($_GET['id']))){
-                    echo '修改货物信息';
+                    echo '修改进货商信息';
                 }else{
-                    echo '添加货物信息';
+                    echo '添加进货商信息';
                 }
             ?>
         </div>
@@ -78,102 +140,47 @@ error_reporting(E_ERROR);
                 <div class="caption font-green bold">
                     <span class="am-icon-code"></span> 表单
                 </div>
-                <div class="tpl-portlet-input tpl-fz-ml">
-                    <div class="portlet-input input-small input-inline">
-<!--                        <div class="input-icon right">-->
-<!--                            <i class="am-icon-search"></i>-->
-<!--                            <input type="text" class="form-control form-control-solid" placeholder="搜索..."> </div>-->
-                    </div>
-                </div>
             </div>
             <div class="tpl-block">
 
                 <div class="am-g">
                     <div class="tpl-form-body tpl-form-line">
-                        <form class="am-form tpl-form-line-form">
+                        <form action="operation.php" method="post" class="am-form tpl-form-line-form">
+                            <input type="hidden" name="id" value="<?=intval($_GET['id'])?>">
                             <div class="am-form-group">
-                                <label for="user-name" class="am-u-sm-3 am-form-label">标题 <span class="tpl-form-line-small-title">Title</span></label>
+                                <label for="user-name" class="am-u-sm-3 am-form-label"> 联系人姓名 <span class="tpl-form-line-small-title">Username</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="user-name" placeholder="请输入标题文字">
-                                    <small>请填写标题文字10-20字左右。</small>
+                                    <input type="text" name="username" value="<?=$userInfo['username']?>" class="tpl-form-input" id="user-name" placeholder="请输入用户姓名">
                                 </div>
                             </div>
 
                             <div class="am-form-group">
-                                <label for="user-email" class="am-u-sm-3 am-form-label">发布时间 <span class="tpl-form-line-small-title">Time</span></label>
+                                <label class="am-u-sm-3 am-form-label">手机号 <span class="tpl-form-line-small-title">Phone</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="am-form-field tpl-form-no-bg" placeholder="发布时间" data-am-datepicker="" readonly/>
-                                    <small>发布时间为必填</small>
+                                    <input type="text" name="phone" value="<?=$userInfo['phone']?>" placeholder="输入手机号" required>
                                 </div>
                             </div>
 
                             <div class="am-form-group">
-                                <label for="user-phone" class="am-u-sm-3 am-form-label">作者 <span class="tpl-form-line-small-title">Author</span></label>
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label">进货商名称<span class="tpl-form-line-small-title">Name</span></label>
                                 <div class="am-u-sm-9">
-                                    <select data-am-selected="{searchBox: 1}">
-                                        <option value="a">-The.CC</option>
-                                        <option value="b">夕风色</option>
-                                        <option value="o">Orange</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="am-form-group">
-                                <label class="am-u-sm-3 am-form-label">SEO关键字 <span class="tpl-form-line-small-title">SEO</span></label>
-                                <div class="am-u-sm-9">
-                                    <input type="text" placeholder="输入SEO关键字">
-                                </div>
-                            </div>
-
-                            <div class="am-form-group">
-                                <label for="user-weibo" class="am-u-sm-3 am-form-label">封面图 <span class="tpl-form-line-small-title">Images</span></label>
-                                <div class="am-u-sm-9">
-                                    <div class="am-form-group am-form-file">
-                                        <div class="tpl-form-file-img">
-                                            <img src="../assets/img/a5.png" alt="">
-                                        </div>
-                                        <button type="button" class="am-btn am-btn-danger am-btn-sm">
-                                            <i class="am-icon-cloud-upload"></i> 添加封面图片</button>
-                                        <input id="doc-form-file" type="file" multiple>
+                                    <input type="text" name="name" value="<?=$userInfo['name']?>" id="user-weibo" placeholder="请添加进货商名称">
+                                    <div>
                                     </div>
-
                                 </div>
                             </div>
-
                             <div class="am-form-group">
-                                <label for="user-weibo" class="am-u-sm-3 am-form-label">添加分类 <span class="tpl-form-line-small-title">Type</span></label>
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label">地址 <span class="tpl-form-line-small-title">Address</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" id="user-weibo" placeholder="请添加分类用点号隔开">
+                                    <input type="text" name="address" value="<?=$userInfo['address']?>" id="user-weibo" placeholder="请添加积分地址">
                                     <div>
 
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="am-form-group">
-                                <label for="user-intro" class="am-u-sm-3 am-form-label">隐藏文章</label>
-                                <div class="am-u-sm-9">
-                                    <div class="tpl-switch">
-                                        <input type="checkbox" class="ios-switch bigswitch tpl-switch-btn" checked />
-                                        <div class="tpl-switch-btn-view">
-                                            <div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="am-form-group">
-                                <label for="user-intro" class="am-u-sm-3 am-form-label">文章内容</label>
-                                <div class="am-u-sm-9">
-                                    <textarea class="" rows="10" id="user-intro" placeholder="请输入文章内容"></textarea>
-                                </div>
-                            </div>
-
                             <div class="am-form-group">
                                 <div class="am-u-sm-9 am-u-sm-push-3">
-                                    <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交</button>
+                                    <input type="submit" class="am-btn am-btn-primary tpl-btn-bg-color-success " name="提交">
                                 </div>
                             </div>
                         </form>

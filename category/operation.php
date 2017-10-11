@@ -114,7 +114,7 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
         <div class="tpl-left-nav-list">
             <ul class="tpl-left-nav-menu">
                 <li class="tpl-left-nav-item">
-                    <a href="../index.php" class="nav-link active">
+                    <a href="../index.php" class="nav-link ">
                         <i class="am-icon-home"></i>
                         <span>会员信息</span>
                     </a>
@@ -128,7 +128,7 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
 
                 <li class="tpl-left-nav-item">
                     <!-- 打开状态 a 标签添加 active 即可   -->
-                    <a href="../category/category.php" class="nav-link tpl-left-nav-link-list">
+                    <a href="../category/category.php" class="nav-link tpl-left-nav-link-list active">
                         <i class="am-icon-table"></i>
                         <span>货品分类</span>
                     </a>
