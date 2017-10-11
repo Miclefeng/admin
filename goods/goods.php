@@ -40,7 +40,7 @@ if(isset($_GET['col']) && !empty(trim($_GET['col']))){
     $query_str['col'] = $color;
 }
 
-$pagesize = 20;
+$pagesize = 2;
 
 $res = $db->count("SELECT count(`id`) AS `total` FROM `goods` " . $where);
 $pagetotal = ceil($res['total'] / $pagesize);
@@ -57,7 +57,7 @@ if (1 < $pagetotal) {
     $pagination = new Pagination();
 
     $pagination->config([
-        'base_url' => '/goods/goods.php',
+        'base_url' => 'goods.php',
         'pagetotal' => $pagetotal,
         'cur_page' => $page,
         'query_str' => $query_str,

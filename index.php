@@ -42,7 +42,7 @@ if (1 < $pagetotal) {
     $pagination = new Pagination();
 
     $pagination->config([
-        'base_url' => '/index.php',
+        'base_url' => 'index.php',
         'pagetotal' => $pagetotal,
         'cur_page' => $page,
         'query_str' => $query_str,
