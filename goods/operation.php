@@ -17,7 +17,7 @@ if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
     $data['sell'] = (isset($_POST['sell']) && !empty($_POST['sell'])) ? (float) $_POST['sell'] : 0;
     $data['category'] = (isset($_POST['category']) && !empty($_POST['category'])) ? intval($_POST['category']) : 0 ;
     $data['size'] = (isset($_POST['size']) && !empty($_POST['size'])) ? (float) $_POST['size'] : 0 ;
-    $data['color'] = (isset($_POST['color']) && !empty($_POST['color'])) ? (float) $_POST['color'] : 0 ;
+    $data['color'] = (isset($_POST['color']) && !empty($_POST['color'])) ? trim($_POST['color']) : 0 ;
     $data['store'] = (isset($_POST['store']) && !empty($_POST['store'])) ? intval($_POST['store']) : 0 ;
     $data['sold'] = (isset($_POST['sold']) && !empty($_POST['sold'])) ? intval($_POST['sold']) : 0 ;
     $data['firm'] = (isset($_POST['firm']) && !empty($_POST['firm'])) ? intval($_POST['firm']) : 0 ;
@@ -55,7 +55,7 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
 
 $sql = "SELECT * FROM `firm`";
 $firm = $db->query($sql)->row_all();
-
+$category = get_category($db);
 function get_category($db)
 {
     $sql = "SELECT * FROM `category` WHERE `pid`=0";
@@ -152,40 +152,71 @@ function get_category($db)
                         <form action="operation.php" method="post" class="am-form tpl-form-line-form">
                             <input type="hidden" name="id" value="<?=intval($_GET['id'])?>">
                             <div class="am-form-group">
-                                <label for="user-name" class="am-u-sm-3 am-form-label"> 联系人姓名 <span class="tpl-form-line-small-title">Username</span></label>
+                                <label for="user-name" class="am-u-sm-3 am-form-label"> 货号 <span class="tpl-form-line-small-title">GoodsNo</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" name="username" value="<?=$userInfo['username']?>" class="tpl-form-input" id="user-name" placeholder="请输入用户姓名">
+                                    <input type="text" name="goods_no" value="<?=$goodsInfo['goods_no']?>" class="tpl-form-input" id="user-name" placeholder="请输入货品编号" required>
                                 </div>
                             </div>
 
                             <div class="am-form-group">
-                                <label class="am-u-sm-3 am-form-label">手机号 <span class="tpl-form-line-small-title">Phone</span></label>
+                                <label class="am-u-sm-3 am-form-label"> 进价 <span class="tpl-form-line-small-title"> Price </span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" name="phone" value="<?=$userInfo['phone']?>" placeholder="输入手机号" required>
+                                    <input type="number" step="0.01" name="price" value="<?=$goodsInfo['price']?>" placeholder="请输入进价" required>
                                 </div>
                             </div>
 
                             <div class="am-form-group">
-                                <label for="user-weibo" class="am-u-sm-3 am-form-label">进货商名称<span class="tpl-form-line-small-title">Name</span></label>
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label"> 售价 <span class="tpl-form-line-small-title">Sell</span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" name="name" value="<?=$userInfo['name']?>" id="user-weibo" placeholder="请添加进货商名称">
-                                    <div>
-                                    </div>
+                                    <input type="number" step="0.01" name="sell" value="<?=$goodsInfo['sell']?>" id="user-weibo" placeholder="请输入售价" required>
                                 </div>
                             </div>
                             <div class="am-form-group">
-                                <label for="user-weibo" class="am-u-sm-3 am-form-label">地址 <span class="tpl-form-line-small-title">Address</span></label>
+                                <label for="user-phone" class="am-u-sm-3 am-form-label"> 所属分类 <span class="tpl-form-line-small-title"> Belong </span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" name="address" value="<?=$userInfo['address']?>" id="user-weibo" placeholder="请添加积分地址">
-                                    <div>
-
-                                    </div>
+                                    <select name="category">
+                                        <?php foreach ($category as $k => $v):?>
+                                            <?php if(isset($v['children']) && !empty($v['children'])):?>
+                                                <optgroup label="<?=$v['name']?>">
+                                                    <?php foreach ($v['children'] as $m => $n):?>
+                                                        <option value="<?=$n['id']?>" <?php if($n['id'] == $goodsInfo['category']):?>selected<?php endif;?>><?=$n['name']?></option>
+                                                    <?php endforeach;?>
+                                                </optgroup>
+                                            <?php else:?>
+                                                <option value="<?=$v['id']?>" <?php if($v['id'] == $goodsInfo['category']):?>selected<?php endif;?>><?=$v['name']?></option>
+                                            <?php endif;?>
+                                        <?php endforeach;?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="am-form-group">
-                                <label for="user-phone" class="am-u-sm-3 am-form-label"> 进货商 <span class="tpl-form-line-small-title"> Belong </span></label>
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label"> 尺码 <span class="tpl-form-line-small-title">Size</span></label>
                                 <div class="am-u-sm-9">
-                                    <select name="parent">
+                                    <input type="number" step="0.5" name="size" value="<?=$goodsInfo['size']?>" id="user-weibo" placeholder="请输入尺码" required>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label"> 颜色 <span class="tpl-form-line-small-title">Color</span></label>
+                                <div class="am-u-sm-9">
+                                    <input type="text" name="color" value="<?=$goodsInfo['color']?>" id="user-weibo" placeholder="请输入颜色" required>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label"> 库存 <span class="tpl-form-line-small-title">Store</span></label>
+                                <div class="am-u-sm-9">
+                                    <input type="number" name="store" value="<?=$goodsInfo['store']?>" id="user-weibo" placeholder="请输入库存" required>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label"> 销量 <span class="tpl-form-line-small-title">Sold</span></label>
+                                <div class="am-u-sm-9">
+                                    <input type="number" name="sold" value="<?=$goodsInfo['sold']?>" id="user-weibo" placeholder="请输入销量" required>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-phone" class="am-u-sm-3 am-form-label"> 进货商 <span class="tpl-form-line-small-title"> Firm</span></label>
+                                <div class="am-u-sm-9">
+                                    <select name="firm">
                                         <?php foreach ($firm as $k => $v):?>
                                             <option value="<?=$v['id']?>" <?php if($v['id'] == $goodsInfo['firm']):?>selected<?php endif;?>>- <?=$v['name']?> -</option>
                                         <?php endforeach;?>

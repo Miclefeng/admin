@@ -56,8 +56,32 @@ $sql = "SELECT * FROM `goods` ".$where." ORDER BY `id` DESC LIMIT {$offset},{$pa
 $data = $db->query($sql)->row_all();
 $category = get_category($db);
 $goods = [];
+$i = 0;
 foreach($data as $k => $v){
-
+    $goods[$i]['id'] = $v['id'];
+    $goods[$i]['goods_no'] = $v['goods_no'];
+    $goods[$i]['price'] = $v['price'];
+    $goods[$i]['sell'] = $v['sell'];
+    foreach ($category as $m => $n){
+        if($n['id'] == $v['category']){
+            $goods[$i]['category'] = $n['name'];
+            break;
+        }else{
+            foreach ($n['children'] as $h => $j){
+                if($j['id'] == $v['category']){
+                    $goods[$i]['category'] = $n['name'].'/'.$j['name'];
+                }
+            }
+        }
+    }
+    $goods[$i]['size'] = $v['size'];
+    $goods[$i]['color'] = $v['color'];
+    $goods[$i]['store'] = $v['store'];
+    $goods[$i]['sold'] = $v['sold'];
+    $sql = "SELECT `name` FROM `firm` WHERE `id`={$v['firm']}";
+    $firm = $db->query($sql)->row_one();
+    $goods[$i]['firm'] = $firm['name'];
+    $i++;
 }
 
 function get_category($db)
@@ -222,7 +246,7 @@ function get_category($db)
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($data as $k => $v): ?>
+                                    <?php foreach ($goods as $k => $v): ?>
                                         <tr class="edit-goal-tr" uid="<?=$v['id']?>">
                                             <td><input type="checkbox"></td>
                                             <td><?= $v['id'] ?></td>
