@@ -1,9 +1,22 @@
 <?php
 error_reporting(E_ERROR);
 require_once("../Mpdo.php");
+require_once("../Pagination.php");
 $conf = include_once("../config.php");
-$db = new Mpdo($conf['database']);
-$sql = "SELECT * FROM `user`";
+$mysql = new Mpdo();
+$db = $mysql->connect($conf['database']);
+
+$sql = "SELECT * FROM `category` ORDER BY `pid` ASC,`id` ASC";
+$data = $db->query($sql)->row_all();
+
+$category = [];
+foreach ($data as $k => $v){
+    $category[$v['id']]['id'] = $v['id'];
+    $category[$v['id']]['name'] = $v['name'];
+    if(isset($category[$v['pid']])){
+        $category[$v['id']]['parent'] = $category[$v['pid']]['name'];
+    }
+}
 ?>
 <!doctype html>
 <html>
@@ -40,22 +53,17 @@ $sql = "SELECT * FROM `user`";
                         <span>货品信息</span>
                     </a>
                 </li>
-
                 <li class="tpl-left-nav-item">
                     <!-- 打开状态 a 标签添加 active 即可   -->
-                    <a href="category.php" class="nav-link tpl-left-nav-link-list active">
+                    <a href="../category/category.php" class="nav-link tpl-left-nav-link-list active">
                         <i class="am-icon-table"></i>
                         <span>货品分类</span>
-                        <!-- 列表打开状态的i标签添加 tpl-left-nav-more-ico-rotate 图表即90°旋转  -->
-                        <!--                  <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i> -->
                     </a>
                 </li>
-
                 <li class="tpl-left-nav-item">
-                    <a href="../firm/firm.php" class="nav-link tpl-left-nav-link-list">
+                    <a href="../firm/firm.php" class="nav-link tpl-left-nav-link-list ">
                         <i class="am-icon-wpforms"></i>
                         <span>进货商信息</span>
-                        <!-- <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right"></i> -->
                     </a>
                 </li>
             </ul>
@@ -63,115 +71,98 @@ $sql = "SELECT * FROM `user`";
     </div>
     <div class="tpl-content-wrapper">
         <div class="tpl-content-page-title">
-            商品分类列表
+            货品分类信息列表
         </div>
         <div class="tpl-portlet-components">
             <div class="portlet-title">
                 <div class="caption font-green bold">
                     <span class="am-icon-code"></span> 列表
                 </div>
-<!--                <div class="tpl-portlet-input tpl-fz-ml">-->
-<!--                    <div class="portlet-input input-small input-inline">-->
-<!--                        <div class="input-icon right">-->
-<!--                            <i class="am-icon-search"></i>-->
-<!--                            <input type="text" class="form-control form-control-solid" placeholder="搜索..."></div>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
             <div class="tpl-block">
                 <div class="am-g">
                     <div class="am-u-sm-12 am-u-md-6">
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
-                                <a href="operation.php" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</a>
+                                <a href="operation.php" class="am-btn am-btn-default am-btn-success"><span
+                                            class="am-icon-plus"></span> 新增
+                                </a>
                             </div>
                         </div>
                     </div>
-<!--                    <div class="am-u-sm-12 am-u-md-3">-->
-<!--                        <div class="am-form-group">-->
-<!--                            <select data-am-selected="{btnSize: 'sm'}">-->
-<!--                                <option value="option1">所有类别</option>-->
-<!--                                <option value="option2">IT业界</option>-->
-<!--                                <option value="option3">数码产品</option>-->
-<!--                                <option value="option3">笔记本电脑</option>-->
-<!--                                <option value="option3">平板电脑</option>-->
-<!--                                <option value="option3">只能手机</option>-->
-<!--                                <option value="option3">超极本</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="am-u-sm-12 am-u-md-3">-->
-<!--                        <div class="am-input-group am-input-group-sm">-->
-<!--                            <input type="text" class="am-form-field">-->
-<!--                            <span class="am-input-group-btn">-->
-<!--            <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search"-->
-<!--                    type="button"></button>-->
-<!--          </span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-                </div>
-                <div class="am-g">
-                    <div class="am-u-sm-12">
-                        <form class="am-form">
-                            <table class="am-table am-table-striped am-table-hover table-main"
-                            <thead>
-                            <tr>
-                                <th class="table-check"><input type="checkbox" class="tpl-table-fz-check"></th>
-                                <th class="table-id">ID</th>
-                                <th class="table-title">标题</th>
-                                <th class="table-type">类别</th>
-                                <th class="table-author am-hide-sm-only">作者</th>
-                                <th class="table-date am-hide-sm-only">修改日期</th>
-                                <th class="table-set">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>1</td>
-                                <td><a href="#">Business management</a></td>
-                                <td>default</td>
-                                <td class="am-hide-sm-only">测试1号</td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                <td>
-                                    <div class="am-btn-toolbar">
-                                        <div class="am-btn-group am-btn-group-xs">
-                                            <a href="operation.php?id=<?= $v['id'] ?>"
-                                               class="am-btn am-btn-default am-btn-xs am-text-secondary"><span
-                                                        class="am-icon-pencil-square-o"></span> 编辑</a>
-                                            <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only">
-                                                <span class="am-icon-trash-o"></span> 删除
-                                            </button>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                            </table>
-<!--                            <div class="am-cf">-->
-<!--                                <div class="am-fr">-->
-<!--                                    <ul class="am-pagination tpl-pagination">-->
-<!--                                        <li class="am-disabled"><a href="#">«</a></li>-->
-<!--                                        <li class="am-active"><a href="#">1</a></li>-->
-<!--                                        <li><a href="#">2</a></li>-->
-<!--                                        <li><a href="#">3</a></li>-->
-<!--                                        <li><a href="#">4</a></li>-->
-<!--                                        <li><a href="#">5</a></li>-->
-<!--                                        <li><a href="#">»</a></li>-->
-<!--                                    </ul>-->
-<!--                                </div>-->
-<!--                            </div>-->
-                            <hr>
-                        </form>
+                    <div class="am-g">
+                        <div class="am-u-sm-12">
+                            <form class="am-form">
+                                <table class="am-table am-table-striped am-table-hover table-main">
+                                    <thead>
+                                    <tr>
+                                        <th class="table-check"><input type="checkbox" class="tpl-table-fz-check"></th>
+                                        <th class="table-id">ID</th>
+                                        <th class="table-title">分类名称</th>
+                                        <th class="table-type">所属分类</th>
+                                        <th class="table-set">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($category as $k => $v): ?>
+                                        <tr class="edit-goal-tr" uid="<?= $v['id'] ?>">
+                                            <td><input type="checkbox"></td>
+                                            <td><?= $v['id'] ?></td>
+                                            <td><?= $v['name'] ?></td>
+                                            <td><?= $v['parent'] ?></td>
+                                            <td class="operation">
+                                                <div class="am-btn-toolbar edit-delete-btn">
+                                                    <div class="am-btn-group am-btn-group-xs">
+                                                        <a href="operation.php?id=<?= $v['id'] ?>"
+                                                           class="am-btn am-btn-default am-btn-xs am-text-secondary"><span
+                                                                    class="am-icon-pencil-square-o"></span> 编辑
+                                                        </a>
+                                                        <a uid="<?= $v['id'] ?>"
+                                                           class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only delete-user">
+                                                            <span class="am-icon-trash-o"></span> 删除
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <hr>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
+                <div class="tpl-alert"></div>
             </div>
-            <div class="tpl-alert"></div>
         </div>
     </div>
-</div>
-<script src="../assets/js/jquery.min.js"></script>
-<script src="../assets/js/amazeui.min.js"></script>
-<script src="../assets/js/app.js"></script>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/amazeui.min.js"></script>
+    <script src="../assets/js/app.js"></script>
 </body>
+<script type="application/javascript">
+    $(".delete-user").click(function () {
+        if (confirm('你确定要删除吗？')) {
+            var id = $(this).attr('uid');
+            $.ajax({
+                type: "POST",
+                url: "delete.php",
+                dataType: "json",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.status == 2000) {
+                        alert(data.msg);
+                        window.location = "category.php";
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    });
+</script>
 </html>

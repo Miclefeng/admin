@@ -102,7 +102,6 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                         <i class="am-icon-table"></i>
                         <span>货品分类</span>
                         <!-- 列表打开状态的i标签添加 tpl-left-nav-more-ico-rotate 图表即90°旋转  -->
-                        <!--                  <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i> -->
                     </a>
                 </li>
 
@@ -110,7 +109,6 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                     <a href="../firm/firm.php" class="nav-link tpl-left-nav-link-list">
                         <i class="am-icon-wpforms"></i>
                         <span>进货商信息</span>
-                        <!-- <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right"></i> -->
                     </a>
                 </li>
             </ul>
@@ -131,13 +129,6 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                 <div class="caption font-green bold">
                     <span class="am-icon-code"></span> 表单
                 </div>
-                <div class="tpl-portlet-input tpl-fz-ml">
-                    <div class="portlet-input input-small input-inline">
-<!--                        <div class="input-icon right">-->
-<!--                            <i class="am-icon-search"></i>-->
-<!--                            <input type="text" class="form-control form-control-solid" placeholder="搜索..."> </div>-->
-                    </div>
-                </div>
             </div>
             <div class="tpl-block">
 
@@ -152,13 +143,6 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                                 </div>
                             </div>
 
-<!--                            <div class="am-form-group">-->
-<!--                                <label for="user-email" class="am-u-sm-3 am-form-label">生日 <span class="tpl-form-line-small-title">Birthday</span></label>-->
-<!--                                <div class="am-u-sm-9">-->
-<!--                                    <input type="text" name="date" class="am-form-field tpl-form-no-bg" placeholder="生日" data-am-datepicker="" readonly/>-->
-<!--                                </div>-->
-<!--                            </div>-->
-
                             <div class="am-form-group">
                                 <label class="am-u-sm-3 am-form-label">手机号 <span class="tpl-form-line-small-title">Phone</span></label>
                                 <div class="am-u-sm-9">
@@ -167,7 +151,7 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                             </div>
 
                             <div class="am-form-group">
-                                <label for="user-weibo" class="am-u-sm-3 am-form-label">进货商名称<span class="tpl-form-line-small-title">Goal</span></label>
+                                <label for="user-weibo" class="am-u-sm-3 am-form-label">进货商名称<span class="tpl-form-line-small-title">Name</span></label>
                                 <div class="am-u-sm-9">
                                     <input type="text" name="name" value="<?=$userInfo['name']?>" id="user-weibo" placeholder="请添加进货商名称">
                                     <div>
