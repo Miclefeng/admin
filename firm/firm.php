@@ -6,53 +6,53 @@ $conf = include_once("../config.php");
 $mysql = new Mpdo();
 $db = $mysql->connect($conf['database']);
 
-if (isset($_GET['p']) && !empty(intval($_GET['p']))) {
-    $page = intval($_GET['p']);
-} else {
-    $page = 1;
-}
-if ($page < 1) $page = 1;
+//if (isset($_GET['p']) && !empty(intval($_GET['p']))) {
+//    $page = intval($_GET['p']);
+//} else {
+//    $page = 1;
+//}
+//if ($page < 1) $page = 1;
+//
+//$search = trim($_GET['s']);
+//$where = 'WHERE 1=1';
+//$query_str = [];
+//if (!empty($search)) {
+//    if (preg_match("/[^0-9]+/is", $search)) {
+//        $where .= " AND `username` like '{$search}%'";
+//    } else {
+//        $where .= " AND `phone`='{$search}'";
+//    }
+//    $query_str['s'] = $search;
+//}
+//
+//$pagesize = 20;
+//
+//$res = $db->count("SELECT count(`id`) AS `total` FROM `firm` " . $where);
+//$pagetotal = ceil($res['total'] / $pagesize);
+//
+//if ($pagetotal > 0) {
+//    if ($page > $pagetotal) $page = $pagetotal;
+//}
+//
+//$offset = ($page - 1) * $pagesize;
+//
+//$page_link = [];
+//if (1 < $pagetotal) {
+//
+//    $pagination = new Pagination();
+//
+//    $pagination->config([
+//        'base_url' => '/index.php',
+//        'pagetotal' => $pagetotal,
+//        'cur_page' => $page,
+//        'query_str' => $query_str,
+//        'show_link_nums' => 5
+//    ]);
+//
+//    $page_link = $pagination->create_links('array');
+//}
 
-$search = trim($_GET['s']);
-$where = 'WHERE 1=1';
-$query_str = [];
-if (!empty($search)) {
-    if (preg_match("/[^0-9]+/is", $search)) {
-        $where .= " AND `username` like '{$search}%'";
-    } else {
-        $where .= " AND `phone`='{$search}'";
-    }
-    $query_str['s'] = $search;
-}
-
-$pagesize = 20;
-
-$res = $db->count("SELECT count(`id`) AS `total` FROM `firm` " . $where);
-$pagetotal = ceil($res['total'] / $pagesize);
-
-if ($pagetotal > 0) {
-    if ($page > $pagetotal) $page = $pagetotal;
-}
-
-$offset = ($page - 1) * $pagesize;
-
-$page_link = [];
-if (1 < $pagetotal) {
-
-    $pagination = new Pagination();
-
-    $pagination->config([
-        'base_url' => '/index.php',
-        'pagetotal' => $pagetotal,
-        'cur_page' => $page,
-        'query_str' => $query_str,
-        'show_link_nums' => 5
-    ]);
-
-    $page_link = $pagination->create_links('array');
-}
-
-$sql = "SELECT * FROM `firm` " . $where . " ORDER BY `id` DESC LIMIT {$offset},{$pagesize}";
+$sql = "SELECT * FROM `firm` ORDER BY `id` DESC";
 $data = $db->query($sql)->row_all();
 ?>
 <!doctype html>
