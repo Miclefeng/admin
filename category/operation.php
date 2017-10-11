@@ -18,7 +18,7 @@ if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $data['name'] = (isset($_POST['name']) && !empty($_POST['name'])) ? trim($_POST['name']) : '' ;
     if(empty($data['name'])){
-        echo '<script>alert("请输入分类名称！");window.history.go(-1);</script>>';
+        echo '<script>alert("请输入分类名称！");window.history.go(-1);</script>';
         exit();
     }
     $data['parent'] = (isset($_POST['parent']) && !empty($_POST['parent'])) ? intval($_POST['parent']) : 0 ;
@@ -28,20 +28,20 @@ if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "UPDATE `category` SET `name`=?,`pid`=? WHERE `id`={$id}";
         $res = $db->update($sql,array_values($data));
         if($res){
-            echo '<script>alert("修改分类信息成功！");window.location = "category.php";</script>>';
+            echo '<script>alert("修改分类信息成功！");window.location = "category.php";</script>';
             exit();
         }else{
-            echo '<script>alert("修改分类信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("修改分类信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }else{
         $sql = "INSERT INTO `category` (`name`,`pid`) VALUES (?,?)";
         $res = $db->insert($sql,array_values($data));
         if($res){
-            echo '<script>alert("添加分类信息成功！");window.location = "category.php";</script>>';
+            echo '<script>alert("添加分类信息成功！");window.location = "category.php";</script>';
             exit();
         }else{
-            echo '<script>alert("添加分类信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("添加分类信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }

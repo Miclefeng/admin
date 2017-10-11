@@ -10,7 +10,7 @@ require_once("../Mpdo.php");
 $conf = include_once("../config.php");
 if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
     if(empty($_POST['phone']) || !is_numeric(trim($_POST['phone']))){
-        echo '<script>alert("请输入正确的手机号！");window.history.go(-1);</script>>';
+        echo '<script>alert("请输入正确的手机号！");window.history.go(-1);</script>';
         exit();
     }
 
@@ -26,26 +26,26 @@ if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
         $sql = "UPDATE `firm` SET `name`=?,`phone`=?,`address`=?,`username`=? WHERE `id`={$id}";
         $res = $db->update($sql,array_values($data));
         if($res){
-            echo '<script>alert("修改进货商信息成功！");window.location = "firm.php";</script>>';
+            echo '<script>alert("修改进货商信息成功！");window.location = "firm.php";</script>';
             exit();
         }else{
-            echo '<script>alert("修改进货商信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("修改进货商信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }else{
         $sql = "SELECT `id` FROM `firm` WHERE `phone`='{$data['phone']}'";
         $res = $db->query($sql)->row_one();
         if(!empty($res)){
-            echo '<script>alert("手机号已被注册！");window.history.go(-1);</script>>';
+            echo '<script>alert("手机号已被注册！");window.history.go(-1);</script>';
             exit();
         }
         $sql = "INSERT INTO `firm` (`name`,`phone`,`address`,`username`) VALUES (?,?,?,?)";
         $res = $db->insert($sql,array_values($data));
         if($res){
-            echo '<script>alert("添加进货商信息成功！");window.location = "firm.php";</script>>';
+            echo '<script>alert("添加进货商信息成功！");window.location = "firm.php";</script>';
             exit();
         }else{
-            echo '<script>alert("添加进货商信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("添加进货商信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }

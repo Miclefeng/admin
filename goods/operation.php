@@ -11,35 +11,36 @@ $conf = include_once("../config.php");
 $mysql = new Mpdo();
 $db = $mysql->connect($conf['database']);
 if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(empty($_POST['phone']) || !is_numeric(trim($_POST['phone']))){
-        echo '<script>alert("请输入正确的手机号！");window.history.go(-1);</script>>';
-        exit();
-    }
 
-    $data['name'] = (isset($_POST['name']) && !empty($_POST['name'])) ? trim($_POST['name']) : '' ;
-    $data['phone'] = (isset($_POST['phone']) && !empty($_POST['phone'])) ? trim($_POST['phone']) : '' ;
-    $data['address'] = (isset($_POST['address']) && !empty($_POST['address'])) ? trim($_POST['address']) : '' ;
-    $data['username'] = (isset($_POST['username']) && !empty($_POST['username'])) ? trim($_POST['username']) : '' ;
+    $data['goods_no'] = (isset($_POST['goods_no']) && !empty($_POST['goods_no'])) ? trim($_POST['goods_no']) : '' ;
+    $data['price'] = (isset($_POST['price']) && !empty($_POST['price'])) ? (float) $_POST['price'] : 0;
+    $data['sell'] = (isset($_POST['sell']) && !empty($_POST['sell'])) ? (float) $_POST['sell'] : 0;
+    $data['category'] = (isset($_POST['category']) && !empty($_POST['category'])) ? intval($_POST['category']) : 0 ;
+    $data['size'] = (isset($_POST['size']) && !empty($_POST['size'])) ? (float) $_POST['size'] : 0 ;
+    $data['color'] = (isset($_POST['color']) && !empty($_POST['color'])) ? (float) $_POST['color'] : 0 ;
+    $data['store'] = (isset($_POST['store']) && !empty($_POST['store'])) ? intval($_POST['store']) : 0 ;
+    $data['sold'] = (isset($_POST['sold']) && !empty($_POST['sold'])) ? intval($_POST['sold']) : 0 ;
+    $data['firm'] = (isset($_POST['firm']) && !empty($_POST['firm'])) ? intval($_POST['firm']) : 0 ;
 
     if(isset($_POST['id']) && !empty(intval($_POST['id']))){
         $id = intval($_POST['id']);
-        $sql = "UPDATE `firm` SET `name`=?,`phone`=?,`address`=?,`username`=? WHERE `id`={$id}";
+        $sql = "UPDATE `goods` SET `goods_no`=?,`price`=?,`sell`=?,`category`=?,`size`=?,`color`=?,`store`=?,`sold`=?,`firm`=? WHERE `id`={$id}";
         $res = $db->update($sql,array_values($data));
         if($res){
-            echo '<script>alert("修改货品信息成功！");window.location = "goods.php";</script>>';
+            echo '<script>alert("修改货品信息成功！");window.location = "goods.php";</script>';
             exit();
         }else{
-            echo '<script>alert("修改货品信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("修改货品信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }else{
-        $sql = "INSERT INTO `firm` (`name`,`phone`,`address`,`username`) VALUES (?,?,?,?)";
+        $sql = "INSERT INTO `goods` (`goods_no`,`price`,`sell`,`category`,`size`,`color`,`store`,`sold`,`firm`) VALUES (?,?,?,?,?,?,?,?,?)";
         $res = $db->insert($sql,array_values($data));
         if($res){
-            echo '<script>alert("添加货品信息成功！");window.location = "goods.php";</script>>';
+            echo '<script>alert("添加货品信息成功！");window.location = "goods.php";</script>';
             exit();
         }else{
-            echo '<script>alert("添加货品信息失败！");window.history.go(-1);</script>>';
+            echo '<script>alert("添加货品信息失败！");window.history.go(-1);</script>';
             exit();
         }
     }
@@ -129,9 +130,9 @@ function get_category($db)
         <div class="tpl-content-page-title">
             <?php
                 if(isset($_GET['id']) && !empty(intval($_GET['id']))){
-                    echo '修改进货商信息';
+                    echo '修改货品信息';
                 }else{
-                    echo '添加进货商信息';
+                    echo '添加货品信息';
                 }
             ?>
         </div>
@@ -195,5 +196,4 @@ function get_category($db)
 <script src="../assets/js/amazeui.min.js"></script>
 <script src="../assets/js/app.js"></script>
 </body>
-
 </html>
