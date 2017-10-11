@@ -41,7 +41,6 @@ if(!empty($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         $sql = "INSERT INTO `firm` (`name`,`phone`,`address`,`username`) VALUES (?,?,?,?)";
         $res = $db->insert($sql,array_values($data));
-        var_dump($res);exit();
         if($res){
             echo '<script>alert("添加进货商信息成功！");window.location = "firm.php";</script>>';
             exit();
