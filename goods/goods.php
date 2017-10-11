@@ -13,16 +13,31 @@ if (isset($_GET['p']) && !empty(intval($_GET['p']))) {
 }
 if ($page < 1) $page = 1;
 
-$search = trim($_GET['s']);
 $where = 'WHERE 1=1';
 $query_str = [];
-if (!empty($search)) {
-    if (preg_match("/[^0-9]+/is", $search)) {
-        $where .= " AND `username` like '{$search}%'";
-    } else {
-        $where .= " AND `phone`='{$search}'";
-    }
-    $query_str['s'] = $search;
+
+if(isset($_GET['c']) && !empty(intval($_GET['c']))){
+    $category = intval($_GET['c']);
+    $where .= " AND `category`={$category} ";
+    $query_str['c'] = $category;
+}
+
+if(isset($_GET['n']) && !empty(trim($_GET['n']))){
+    $goods_no = trim($_GET['n']);
+    $where .= " AND `goods_no`='{$goods_no}' ";
+    $query_str['n'] = $goods_no;
+}
+
+if(isset($_GET['s']) && !empty($_GET['s'])){
+    $size = (float) $_GET['s'];
+    $where .= " AND `size`={$size} ";
+    $query_str['s'] = $size;
+}
+
+if(isset($_GET['col']) && !empty(trim($_GET['col']))){
+    $color = trim($_GET['col']);
+    $where .= " AND `color` like '{$color}%' ";
+    $query_str['col'] = $color;
 }
 
 $pagesize = 20;
@@ -187,7 +202,7 @@ function get_category($db)
             </div>
             <div class="tpl-block">
                 <div class="am-g">
-                    <div class="am-u-sm-12 am-u-md-6">
+                    <div class="am-u-sm-12 am-u-md-3">
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
                                 <a href="operation.php" class="am-btn am-btn-default am-btn-success"><span
@@ -196,33 +211,44 @@ function get_category($db)
                             </div>
                         </div>
                     </div>
-                    <div class="am-u-sm-12 am-u-md-3">
+                    <div class="am-u-sm-12 am-u-md-2">
                         <div class="am-form-group">
-                            <select name="category">
+                            <select id="search-category" name="category">
                                 <option value="">所有类别</option>
                                 <?php foreach ($category as $k => $v):?>
                                     <?php if(isset($v['children']) && !empty($v['children'])):?>
                                         <optgroup label="<?=$v['name']?>">
                                             <?php foreach ($v['children'] as $m => $n):?>
-                                            <option value="<?=$n['id']?>"><?=$n['name']?></option>
+                                            <option value="<?=$n['id']?>" <?php if($n['id'] == intval($_GET['c'])):?>selected<?php endif;?>><?=$n['name']?></option>
                                             <?php endforeach;?>
                                         </optgroup>
                                     <?php else:?>
-                                        <option value="<?=$v['id']?>"><?=$v['name']?></option>
+                                        <option value="<?=$v['id']?>" <?php if($v['id'] == intval($_GET['c'])):?>selected<?php endif;?>><?=$v['name']?></option>
                                     <?php endif;?>
                                 <?php endforeach;?>
                             </select>
                         </div>
                     </div>
+                    <div class="am-u-sm-12 am-u-md-2">
+                        <div class="am-input-group am-input-group-sm">
+                            <input id="search-goods-no" style="width:120px;" name="goods_no" value="<?= trim($_GET['n']) ?>" type="text"
+                                   class="am-form-field" placeholder="      货品编号">
+                        </div>
+                    </div>
+                    <div class="am-u-sm-12 am-u-md-2">
+                        <div class="am-input-group am-input-group-sm">
+                            <input id="search-size" style="width:80px;" name="size" value="<?= trim($_GET['s']) ?>" type="text"
+                                   class="am-form-field" placeholder="      尺码">
+                        </div>
+                    </div>
                     <div class="am-u-sm-12 am-u-md-3">
-                        <form action="goods.php" method="get" class="am-input-group am-input-group-sm">
-                            <input style="width:120px;" name="s" value="<?= trim($_GET['s']) ?>" type="text"
-                                   class="am-form-field" placeholder="姓名或者手机号">
+                        <div class="am-input-group am-input-group-sm">
+                            <input id="search-color" style="width:80px;" name="color" value="<?= trim($_GET['col']) ?>" type="text"
+                                   class="am-form-field" placeholder="      颜色">
                             <span class="am-input-group-btn">
-                                <input class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search"
-                                       type="submit" value="查询">
+                                <span class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search">查询</span>
                               </span>
-                        </form>
+                        </div>
                     </div>
                 </div>
                     <div class="am-g">
@@ -336,5 +362,64 @@ function get_category($db)
             });
         }
     });
+
+    $(".am-input-group-btn").click(function () {
+        var cate = $("#search-category").val();
+        var goods_no = $("#search-goods-no").val();
+        var size = $("#search-size").val();
+        var color = $("#search-color").val();
+
+        if(cate == '' && goods_no == '' && size == '' && color == ''){
+            window.location = 'goods.php';
+            return false;
+        }
+
+        var query_str = [];
+        if(cate != ''){
+            query_str['c'] = cate
+        }
+
+        if(goods_no != ''){
+            query_str['n'] = goods_no
+        }
+
+        if(size != ''){
+            query_str['s'] = size
+        }
+
+        if(color != ''){
+            query_str['col'] = color
+        }
+        var query = build_query(query_str,query_str.length);
+        window.location = "goods.php?"+query;
+    });
+
+    var build_query = function (obj, num_prefix, temp_key) {
+
+        var output_string = []
+
+        Object.keys(obj).forEach(function (val) {
+
+            var key = val;
+
+            num_prefix && !isNaN(key) ? key = num_prefix + key : ''
+
+            var key = encodeURIComponent(key.replace(/[!'()*]/g, escape));
+            temp_key ? key = temp_key + '[' + key + ']' : ''
+
+            if (typeof obj[val] === 'object') {
+                var query = build_query(obj[val], null, key)
+                output_string.push(query)
+            }
+
+            else {
+                var value = encodeURIComponent(obj[val].replace(/[!'()*]/g, escape));
+                output_string.push(key + '=' + value)
+            }
+
+        })
+
+        return output_string.join('&')
+    }
 </script>
 </html>
