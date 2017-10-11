@@ -53,6 +53,9 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
     $goodsInfo = $db->query($sql)->row_one();
 }
 
+$sql = "SELECT * FROM `firm`";
+$firm = $db->query($sql)->row_all();
+
 function get_category($db)
 {
     $sql = "SELECT * FROM `category` WHERE `pid`=0";
@@ -177,6 +180,16 @@ function get_category($db)
                                     <div>
 
                                     </div>
+                                </div>
+                            </div>
+                            <div class="am-form-group">
+                                <label for="user-phone" class="am-u-sm-3 am-form-label"> 进货商 <span class="tpl-form-line-small-title"> Belong </span></label>
+                                <div class="am-u-sm-9">
+                                    <select name="parent">
+                                        <?php foreach ($firm as $k => $v):?>
+                                            <option value="<?=$v['id']?>" <?php if($v['id'] == $goodsInfo['firm']):?>selected<?php endif;?>>- <?=$v['name']?> -</option>
+                                        <?php endforeach;?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="am-form-group">

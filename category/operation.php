@@ -181,7 +181,7 @@ if(!empty(intval($_GET['id'])) && $_SERVER['REQUEST_METHOD'] == 'GET'){
                                     <select name="parent">
                                         <option value="0">-- 顶级分类 --</option>
                                         <?php foreach ($category as $k => $v):?>
-                                            <option value="<?=$v['id']?>" <?php if($v['id'] == $cateInfo['pid']):?>selected<?php endif;?>>-- <?=$v['name']?> --</option>
+                                            <option value="<?=$v['id']?>" <?php if($v['id'] == $cateInfo['pid']):?>selected<?php endif;?>>- <?=$v['name']?> -</option>
                                         <?php endforeach;?>
                                     </select>
                                 </div>
